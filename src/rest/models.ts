@@ -40,7 +40,7 @@ export interface NodeInfo {
   protocolVersion: string;
   /** `SYNCHRONIZED`, `PROCESSING` or `NOT_SYNCHRONIZED`. */
   syncStatus: string;
-  /** True when the node runs a testnet faucet (`POST /api/v1/faucet`). */
+  /** True when the node runs a faucet (`POST /api/v1/faucet`) — only on a private test network, never on the mainnet. */
   faucet: boolean;
 }
 export interface NodeVersion {
