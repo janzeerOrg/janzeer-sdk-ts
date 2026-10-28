@@ -5,6 +5,7 @@ All notable changes to `@janzeer/sdk` are documented here. The format follows
 
 ## Unreleased
 
+- `SPEC_VERSION.protocol` now says **3.4.0**, the wire protocol the node has run since 0.1.0 (it was left at 3.2.0; informational only).
 - Add the typed JSON-RPC `getGenesis()` method for `janzeer_getGenesis`.
 - Minimum Node.js is now **20**: Node 18 is end-of-life and has no global WebCrypto, which the vault (random salt and IV) needs.
 - `npm run typecheck` no longer needs a build first (the examples resolve `@janzeer/sdk` to the sources).

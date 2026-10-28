@@ -30,7 +30,7 @@ export const SPEC_VERSION = Object.freeze({
   /** REST envelope `version` and JSON-RPC `apiVersion` */
   api: '1.1.0',
   /** peer-to-peer wire protocol (informational) */
-  protocol: '3.2.0',
+  protocol: '3.4.0',
   /** conformance vectors format consumed by this SDK's tests */
   vectors: 2,
 });
