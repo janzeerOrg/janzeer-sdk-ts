@@ -12,12 +12,11 @@ verifies.
 npm install @janzeer/sdk
 ```
 
-> **Not on npm yet.** The registry package follows shortly after the mainnet launch. Until then, install from source:
+> **Not on npm yet.** The registry package follows as soon as the `@janzeer` scope is set up. Until then, install straight from
+> GitHub — npm clones the repository and the `prepare` script builds `dist/` for you:
 >
 > ```bash
-> git clone https://github.com/janzeerorg/janzeer-sdk-ts && cd janzeer-sdk-ts
-> npm ci && npm run build
-> cd /path/to/your-project && npm install /path/to/janzeer-sdk-ts
+> npm install github:janzeerOrg/janzeer-sdk-ts
 > ```
 
 ## 60-second quickstart
