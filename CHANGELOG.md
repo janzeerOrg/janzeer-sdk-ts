@@ -3,6 +3,12 @@
 All notable changes to `@janzeer/sdk` are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [SemVer](https://semver.org/).
 
+## [0.1.3] — 2026-11-01
+
+Verified against node **0.1.11** (REST envelope 1.1.0 / protocol 3.4.0). Not on npm yet: `npm install github:janzeerOrg/janzeer-sdk-ts#v0.1.3`.
+
+- `SPEC_VERSION.node` is **0.1.11** (node maintenance release: the `jz` command-line client ships in the node bundle; `GET /info/version` now returns `version`, `apiVersion` and `protocolVersion` like `/info`). No SDK API change.
+
 ## [0.1.2] — 2026-10-28
 
 Verified against node **0.1.10** (REST envelope 1.1.0 / protocol 3.4.0). Not on npm yet: `npm install github:janzeerOrg/janzeer-sdk-ts#v0.1.2`.
