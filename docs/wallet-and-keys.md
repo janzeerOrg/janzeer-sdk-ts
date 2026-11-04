@@ -7,7 +7,7 @@ Janzeer wallets are BIP39-shaped but use the chain's own constants, so a stock b
 ## Create or import
 
 ```ts
-import { Mnemonic, Account } from '@janzeer/sdk';
+import { Mnemonic, Account } from 'janzeer-sdk';
 
 const phrase  = Mnemonic.generate();              // 12 words (pass 256 for 24)
 const account = Account.fromMnemonic(phrase);     // optional second arg: BIP39 passphrase
@@ -36,7 +36,7 @@ The low-level functions are exported: `mnemonicToSeed`, `seedToMasterKey`, `deri
 ## Addresses
 
 ```ts
-import { isValidAddress, normalizeAddress, toChecksumAddress } from '@janzeer/sdk';
+import { isValidAddress, normalizeAddress, toChecksumAddress } from 'janzeer-sdk';
 isValidAddress('0x06e1c0FA9955A700876f8cB0Acc7f13fBA9FB8BA'); // true (correct EIP-55 casing)
 isValidAddress('0x06E1c0fa9955a700876f8cb0acc7f13fba9fb8ba'); // false (mis-cased → likely typo)
 normalizeAddress('0x06e1c0FA…');                              // '0x06e1c0fa…'

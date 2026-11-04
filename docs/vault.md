@@ -1,10 +1,10 @@
 # Vault — a secret at rest
 
-`@janzeer/sdk/vault` seals a mnemonic (or any string) under a password so a wallet can persist it in
+`janzeer-sdk/vault` seals a mnemonic (or any string) under a password so a wallet can persist it in
 `localStorage`, a file or a keychain entry.
 
 ```ts
-import { encryptVault, decryptVault, VaultError } from '@janzeer/sdk/vault';
+import { encryptVault, decryptVault, VaultError } from 'janzeer-sdk/vault';
 
 const blob = encryptVault(mnemonic, password);   // { v: 1, salt, iv, ct } — JSON-safe, base64 fields
 localStorage.setItem('janzeer.vault', JSON.stringify(blob));

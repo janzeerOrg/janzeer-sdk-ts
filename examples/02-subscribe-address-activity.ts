@@ -1,5 +1,5 @@
 // Watch an address over the WebSocket feed and stream new blocks. Ctrl-C to stop.
-import { JanzeerRpcWs } from '@janzeer/sdk';
+import { JanzeerRpcWs } from 'janzeer-sdk';
 
 const ws = await JanzeerRpcWs.connect(process.env.JANZEER_WS_URL ?? 'ws://localhost:7019/rpc/ws', { onEvent: (e) => console.log('[ws]', e.type) });
 const watch = process.env.JANZEER_E2E_RECIPIENT ?? '0x598b1301acef3baba6ce25e38dd17b723f7b98b1';

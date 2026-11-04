@@ -34,4 +34,4 @@ copies them here; `npm run check:vectors` (also part of CI) fails on drift.
 - Amounts are decimal strings at the API boundary; never `number` arithmetic on coin values.
 - Every new node method gets a typed wrapper in `src/rpc/methods.ts` or `src/rest/client.ts`, a model mapper,
   a unit test with a mocked transport, and a line in `CHANGELOG.md`.
-- Public API says *validator*; *promoter* only survives as deprecated aliases in `@janzeer/sdk/crypto`.
+- Public API says *validator*; *promoter* only survives as deprecated aliases in `janzeer-sdk/crypto`.

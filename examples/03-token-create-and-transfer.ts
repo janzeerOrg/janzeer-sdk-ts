@@ -1,5 +1,5 @@
 // Create a JZT-1 token, then move some units. Token amounts are integer base units (bigint or string).
-import { Account, JanzeerClient, JanzeerRpc, TxBuilder, sendAndWait } from '@janzeer/sdk';
+import { Account, JanzeerClient, JanzeerRpc, TxBuilder, sendAndWait } from 'janzeer-sdk';
 
 const client = new JanzeerClient(process.env.JANZEER_NODE_URL ?? 'http://localhost:7019');
 const rpc = new JanzeerRpc(process.env.JANZEER_RPC_URL ?? 'http://localhost:7019');

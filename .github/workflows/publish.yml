@@ -17,7 +17,13 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
-      - run: npm publish --access public --provenance
+      # Releases are normally published from the maintainer's machine first; skip a version the registry already has,
+      # and publish from here only when NPM_TOKEN is set.
+      - run: |
+          v=$(node -p "require('./package.json').version")
+          if npm view "janzeer-sdk@$v" version >/dev/null 2>&1; then echo "janzeer-sdk@$v is already on npm — skipping"; exit 0; fi
+          if [ -z "$NODE_AUTH_TOKEN" ]; then echo "NPM_TOKEN is not set and $v is not on npm — nothing published"; exit 1; fi
+          npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   pages:

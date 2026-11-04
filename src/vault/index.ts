@@ -1,5 +1,5 @@
 /**
- * `@janzeer/sdk/vault` — the mnemonic (or any secret) at rest, sealed with a password: PBKDF2-HMAC-SHA256
+ * `janzeer-sdk/vault` — the mnemonic (or any secret) at rest, sealed with a password: PBKDF2-HMAC-SHA256
  * (250 000 rounds) → AES-256-GCM. Pure JS (no WebCrypto, which is unavailable on plain-http pages). The blob is
  * byte-compatible with the Dart and Kotlin SDK vaults (conformance fixture `vault-fixture.json`).
  * @module

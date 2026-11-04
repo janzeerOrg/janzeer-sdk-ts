@@ -1,11 +1,11 @@
 # Migrating from `janzeerCrypto.js` / `walletApi.js`
 
 Before this SDK the explorer wallet, the jPong mini-app and the parity scripts shared a copied
-`src/wallet/janzeerCrypto.js`. Every export of that file is available unchanged from `@janzeer/sdk/crypto`:
+`src/wallet/janzeerCrypto.js`. Every export of that file is available unchanged from `janzeer-sdk/crypto`:
 
 ```diff
 - import { accountFromMnemonic, buildSignedTransfer, NETWORK_ID } from '@/wallet/janzeerCrypto';
-+ import { accountFromMnemonic, buildSignedTransfer, NETWORK_ID } from '@janzeer/sdk/crypto';
++ import { accountFromMnemonic, buildSignedTransfer, NETWORK_ID } from 'janzeer-sdk/crypto';
 ```
 
 Same names, same results (the conformance test proves both APIs against the same vectors): `toScaledLong`,
@@ -18,7 +18,7 @@ Same names, same results (the conformance test proves both APIs against the same
 `buildSignedPromoter` / `buildSignedExitPromoter` also exist as `buildSignedValidator` /
 `buildSignedExitValidator`; the *promoter* names are kept for compatibility and will not be removed in 0.x.
 
-`vault.js` → `@janzeer/sdk/vault` (`encryptVault` / `decryptVault`; note they are now synchronous — `await`
+`vault.js` → `janzeer-sdk/vault` (`encryptVault` / `decryptVault`; note they are now synchronous — `await`
 on a non-promise is harmless, so existing call sites keep working).
 
 ## Moving to the typed API (recommended)

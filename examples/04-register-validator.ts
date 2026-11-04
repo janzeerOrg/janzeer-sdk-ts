@@ -1,6 +1,6 @@
 // Register (and later exit) a validator node. The 2000 JNZ deposit is NON-refundable — this example only builds
 // and prints the transactions unless RUN_FOR_REAL=1.
-import { Account, JanzeerClient, TxBuilder, VALIDATOR_DEPOSIT, VALIDATOR_FEE } from '@janzeer/sdk';
+import { Account, JanzeerClient, TxBuilder, VALIDATOR_DEPOSIT, VALIDATOR_FEE } from 'janzeer-sdk';
 
 const client = new JanzeerClient(process.env.JANZEER_NODE_URL ?? 'http://localhost:7019');
 const wallet = Account.fromMnemonic(process.env.JANZEER_E2E_MNEMONIC ?? 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about');

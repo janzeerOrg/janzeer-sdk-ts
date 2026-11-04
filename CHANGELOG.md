@@ -1,7 +1,14 @@
 # Changelog
 
-All notable changes to `@janzeer/sdk` are documented here. The format follows
+All notable changes to `janzeer-sdk` are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [SemVer](https://semver.org/).
+
+## [0.1.4] — 2026-11-04
+
+Verified against node **0.1.11** (REST envelope 1.1.0 / protocol 3.4.0). **First release on npm: `npm install janzeer-sdk`.**
+
+- The package is published as **`janzeer-sdk`** (unscoped) — the same name as on PyPI, next to `janzeer_sdk` on pub.dev and `janzeer-sdk-core` on Maven Central. Every import changes from `@janzeer/sdk[/sub]` to `janzeer-sdk[/sub]`; nothing else in the API moved. (The `@janzeer` scope belongs to an npm account that is locked out of its own mailbox; waiting for npm support ended here.)
+- No code change otherwise.
 
 ## [0.1.3] — 2026-11-01
 
@@ -16,7 +23,7 @@ Verified against node **0.1.10** (REST envelope 1.1.0 / protocol 3.4.0). Not on 
 - `SPEC_VERSION.protocol` now says **3.4.0**, the wire protocol the node has run since 0.1.0 (it was left at 3.2.0; informational only).
 - Add the typed JSON-RPC `getGenesis()` method for `janzeer_getGenesis`.
 - Minimum Node.js is now **20**: Node 18 is end-of-life and has no global WebCrypto, which the vault (random salt and IV) needs.
-- `npm run typecheck` no longer needs a build first (the examples resolve `@janzeer/sdk` to the sources).
+- `npm run typecheck` no longer needs a build first (the examples resolve `janzeer-sdk` to the sources).
 - Verified against node **0.1.0** (P2P protocol 3.4.0): `SPEC_VERSION.node` bumped from 0.0.3. No API change for SDK users. New node rule worth knowing: a transaction's `timestamp` must be within 60 s ahead / 6 h behind the node's clock — sign right before you send.
 
 ## Versioning policy
@@ -53,5 +60,5 @@ First release.
 - Errors: `TxRejectedError` / `NonceMismatchError` shared by both transports, `RateLimitedError`,
   `NotSynchronizedError`, `RpcError` family.
 - Vault: PBKDF2-SHA256/250k + AES-256-GCM, cross-SDK fixture.
-- Compat: `@janzeer/sdk/crypto` re-exports the `janzeerCrypto.js` function API; `toPlainNumbers` converts a lossless tree to `JSON.parse` shapes for migrating code.
+- Compat: `janzeer-sdk/crypto` re-exports the `janzeerCrypto.js` function API; `toPlainNumbers` converts a lossless tree to `JSON.parse` shapes for migrating code.
 - Tested against node 0.0.2 / API 1.1.0 / protocol 3.1.0 / vectors v2.

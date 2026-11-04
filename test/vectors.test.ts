@@ -109,7 +109,7 @@ describe('low-level payload functions', () => {
   });
 });
 
-describe('@janzeer/sdk/crypto compat layer', () => {
+describe('janzeer-sdk/crypto compat layer', () => {
   it('reproduces the legacy janzeerCrypto.js results', () => {
     const acct = accountFromMnemonic(V.hd.mnemonic);
     expect(acct).toEqual({ privHex: V.hd.privHex, pubHex: V.hd.pubHex, address: V.hd.address });

@@ -1,28 +1,25 @@
-# @janzeer/sdk
+# janzeer-sdk
 
 Official TypeScript SDK for the [Janzeer](https://janzeer.org) blockchain — a stake-free, permissionless
 Layer-1 with instant finality. Wallet keys and signing, transaction builders, a typed REST client, JSON-RPC over
 HTTP and WebSocket subscriptions. Non-custodial by construction: keys never leave your process, the node only
 verifies.
 
-[![npm](https://img.shields.io/npm/v/@janzeer/sdk)](https://www.npmjs.com/package/@janzeer/sdk)
+[![npm](https://img.shields.io/npm/v/janzeer-sdk)](https://www.npmjs.com/package/janzeer-sdk)
 ![license](https://img.shields.io/badge/license-Apache--2.0-blue)
 
 ```bash
-npm install @janzeer/sdk
+npm install janzeer-sdk
 ```
 
-> **Not on npm yet.** The registry package follows as soon as the `@janzeer` scope is set up. Until then, install straight from
-> GitHub — npm clones the repository and the `prepare` script builds `dist/` for you:
->
-> ```bash
-> npm install github:janzeerOrg/janzeer-sdk-ts
-> ```
+> The package is unscoped on purpose: `janzeer-sdk` is the same name as on PyPI, next to `janzeer_sdk` on pub.dev and
+> `org.janzeer:janzeer-sdk-core` on Maven Central. Installing a tag straight from GitHub also works (the `prepare`
+> script builds `dist/`): `npm install github:janzeerOrg/janzeer-sdk-ts#v0.1.4`.
 
 ## 60-second quickstart
 
 ```ts
-import { Account, JanzeerClient, JanzeerRpc, TxBuilder, formatJnz, waitForFinality } from '@janzeer/sdk';
+import { Account, JanzeerClient, JanzeerRpc, TxBuilder, formatJnz, waitForFinality } from 'janzeer-sdk';
 
 const client = new JanzeerClient('http://localhost:7019');          // REST  (/api/v1)
 const rpc    = new JanzeerRpc('http://localhost:7019');             // JSON-RPC (/rpc)
@@ -53,11 +50,11 @@ That is the whole integration: derive → nonce → build → sign → submit �
 | JSON-RPC | `JanzeerRpc` (HTTP, batches) and `JanzeerRpcWs` (WebSocket + `newBlocks` / `addressActivity` subscriptions) | [json-rpc-and-subscriptions](docs/json-rpc-and-subscriptions.md) |
 | Flows | `waitForFinality`, `sendAndWait`, `nextNonce` | [json-rpc-and-subscriptions](docs/json-rpc-and-subscriptions.md#finality) |
 | Errors | `TxRejectedError`, `NonceMismatchError`, `RateLimitedError`, `RpcError`… | [errors](docs/errors.md) |
-| Vault | `@janzeer/sdk/vault`: `encryptVault` / `decryptVault` (PBKDF2 + AES-GCM) | [vault](docs/vault.md) |
-| Legacy API | `@janzeer/sdk/crypto`: the old `janzeerCrypto.js` functions | [migration](docs/migration.md) |
+| Vault | `janzeer-sdk/vault`: `encryptVault` / `decryptVault` (PBKDF2 + AES-GCM) | [vault](docs/vault.md) |
+| Legacy API | `janzeer-sdk/crypto`: the old `janzeerCrypto.js` functions | [migration](docs/migration.md) |
 
-Subpath exports: `@janzeer/sdk` (everything), `@janzeer/sdk/rest`, `@janzeer/sdk/rpc`, `@janzeer/sdk/vault`,
-`@janzeer/sdk/crypto`. ESM and CommonJS, TypeScript declarations included, `sideEffects: false`.
+Subpath exports: `janzeer-sdk` (everything), `janzeer-sdk/rest`, `janzeer-sdk/rpc`, `janzeer-sdk/vault`,
+`janzeer-sdk/crypto`. ESM and CommonJS, TypeScript declarations included, `sideEffects: false`.
 
 ## Platforms
 

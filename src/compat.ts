@@ -1,5 +1,5 @@
 /**
- * `@janzeer/sdk/crypto` — the function-style API of the `janzeerCrypto.js` module that the explorer, the jPong
+ * `janzeer-sdk/crypto` — the function-style API of the `janzeerCrypto.js` module that the explorer, the jPong
  * mini-app and the parity scripts used before the SDK existed. Kept so those apps migrate by changing an import
  * path. New code should use `Account`, `TxBuilder` and `SignedTx` from the package root.
  * @module

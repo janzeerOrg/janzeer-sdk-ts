@@ -1,5 +1,5 @@
 /**
- * `@janzeer/sdk` — official TypeScript SDK for the Janzeer blockchain.
+ * `janzeer-sdk` — official TypeScript SDK for the Janzeer blockchain.
  *
  * - keys & signing: {@link Mnemonic}, {@link Account}
  * - building transactions: {@link TxBuilder} → {@link UnsignedTx} → {@link SignedTx}
