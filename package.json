@@ -6,7 +6,7 @@
   "homepage": "https://janzeer.org",
   "repository": {
     "type": "git",
-    "url": "https://github.com/janzeerorg/janzeer-sdk-ts.git"
+    "url": "https://github.com/janzeerOrg/janzeer-sdk-ts.git"
   },
   "keywords": [
     "janzeer",
