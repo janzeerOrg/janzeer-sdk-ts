@@ -3,6 +3,12 @@
 All notable changes to `janzeer-sdk` are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [SemVer](https://semver.org/).
 
+## [0.1.5] — 2026-11-09
+
+Verified against node **0.1.12** (REST envelope 1.1.0 / protocol 3.4.0). No API change.
+
+- `SPEC_VERSION.node` is **0.1.12** (node critical fix F-058: GraalVM native nodes could not sync across a block carrying a token transaction, fixed in 0.1.12 with a build-time guard; API 1.1.0 / protocol 3.4.0 unchanged).
+
 ## [0.1.4] — 2026-11-04
 
 Verified against node **0.1.11** (REST envelope 1.1.0 / protocol 3.4.0). **First release on npm: `npm install janzeer-sdk`.**

@@ -14,7 +14,7 @@ npm install janzeer-sdk
 
 > The package is unscoped on purpose: `janzeer-sdk` is the same name as on PyPI, next to `janzeer_sdk` on pub.dev and
 > `org.janzeer:janzeer-sdk-core` on Maven Central. Installing a tag straight from GitHub also works (the `prepare`
-> script builds `dist/`): `npm install github:janzeerOrg/janzeer-sdk-ts#v0.1.4`.
+> script builds `dist/`): `npm install github:janzeerOrg/janzeer-sdk-ts#v0.1.5`.
 
 ## 60-second quickstart
 
@@ -68,7 +68,7 @@ Subpath exports: `janzeer-sdk` (everything), `janzeer-sdk/rest`, `janzeer-sdk/rp
 
 | SDK | Node | REST envelope `version` | Wire protocol | Vectors |
 |---|---|---|---|---|
-| 0.1.x | 0.1.11 | 1.1.0 | 3.4.0 | v2 |
+| 0.1.x | 0.1.12 | 1.1.0 | 3.4.0 | v2 |
 
 `SPEC_VERSION` exports these values; the e2e test checks them against the node on the first call.
 
