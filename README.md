@@ -14,7 +14,7 @@ npm install janzeer-sdk
 
 > The package is unscoped on purpose: `janzeer-sdk` is the same name as on PyPI, next to `janzeer_sdk` on pub.dev and
 > `org.janzeer:janzeer-sdk-core` on Maven Central. Installing a tag straight from GitHub also works (the `prepare`
-> script builds `dist/`): `npm install github:janzeerOrg/janzeer-sdk-ts#v0.1.5`.
+> script builds `dist/`): `npm install github:janzeerOrg/janzeer-sdk-ts#v0.1.6`.
 
 ## 60-second quickstart
 

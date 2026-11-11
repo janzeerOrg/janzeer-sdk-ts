@@ -66,6 +66,10 @@ interface LiveSub {
   kind: SubscriptionKind;
   params: unknown;
   handler: (payload: JsonValue) => void;
+  /** newBlocks only: height of the last block handed to the handler — where a resubscribe resumes */
+  lastHeight?: number;
+  /** true while the server-side subscription must be (re)created: set on reconnect, cleared when the call succeeds */
+  stale?: boolean;
 }
 
 export class JanzeerRpcWs extends RpcMethods {
@@ -79,6 +83,11 @@ export class JanzeerRpcWs extends RpcMethods {
   #closedByUser = false;
   #backoff: number;
   #connecting: Promise<void> | null = null;
+  #everOpened = false;
+  #reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  #resubTimer: ReturnType<typeof setTimeout> | null = null;
+  /** notifications that arrived before their subscription id was registered (the answer and the first event can share a read) */
+  #orphans = new Map<string, JsonValue[]>();
 
   private constructor(url: string, opts: WsOptions) {
     super();
@@ -93,7 +102,12 @@ export class JanzeerRpcWs extends RpcMethods {
   /** Open a socket; resolves once connected. @param url `ws://host:7019/rpc/ws` (an `http(s)://` origin is converted) */
   static async connect(url: string, opts: WsOptions = {}): Promise<JanzeerRpcWs> {
     const c = new JanzeerRpcWs(url, opts);
-    await c.#open();
+    try {
+      await c.#open();
+    } catch (e) {
+      c.close(); // the caller never receives this object: it must not keep retrying in the background
+      throw e;
+    }
     return c;
   }
 
@@ -136,6 +150,10 @@ export class JanzeerRpcWs extends RpcMethods {
   /** Close the socket; no reconnect. Pending calls reject, subscriptions are dropped. */
   close(): void {
     this.#closedByUser = true;
+    if (this.#reconnectTimer) clearTimeout(this.#reconnectTimer);
+    if (this.#resubTimer) clearTimeout(this.#resubTimer);
+    this.#reconnectTimer = this.#resubTimer = null;
+    this.#orphans.clear();
     this.#subs.clear();
     this.#ws?.close(1000, 'client closed');
     this.#ws = null;
@@ -147,6 +165,7 @@ export class JanzeerRpcWs extends RpcMethods {
     const id = String(await this.call('janzeer_subscribe', { kind, params }));
     const live: LiveSub = { id, kind, params, handler };
     this.#subs.set(id, live);
+    this.#flushOrphans(live);
     const unsubscribe = async (): Promise<boolean> => {
       this.#subs.delete(live.id);
       if (!this.connected) return true;
@@ -182,12 +201,14 @@ export class JanzeerRpcWs extends RpcMethods {
       ws.addEventListener('open', () => {
         clearTimeout(timer);
         this.#ws = ws;
+        this.#everOpened = true;
         this.#backoff = this.#opts.reconnectDelayMs;
         this.#opts.onEvent?.({ type: 'open' });
         if (!settled) {
           settled = true;
           resolve();
         }
+        for (const sub of this.#subs.values()) sub.stale = true; // the server forgot them with the old socket
         void this.#resubscribe();
       });
       ws.addEventListener('message', (ev: { data: unknown }) => this.#onMessage(typeof ev.data === 'string' ? ev.data : String(ev.data)));
@@ -217,10 +238,14 @@ export class JanzeerRpcWs extends RpcMethods {
     return this.#connecting;
   }
 
+  /** ONE pending attempt at a time. Every failed open ends in a `close` event, and every `call()` during an outage opens
+   *  a socket: without this guard each of them started its own endless retry chain. */
   #scheduleReconnect() {
+    if (this.#reconnectTimer || !this.#everOpened) return;
     const delay = this.#backoff;
     this.#backoff = Math.min(this.#backoff * 2, 30_000);
-    setTimeout(() => {
+    this.#reconnectTimer = setTimeout(() => {
+      this.#reconnectTimer = null;
       if (this.#closedByUser || this.connected) return;
       this.#open().catch(() => {
         /* the close handler schedules the next attempt */
@@ -228,22 +253,69 @@ export class JanzeerRpcWs extends RpcMethods {
     }, delay);
   }
 
+  /** Re-create every stale subscription. One that fails stays registered (and stale) and is tried again — it used to be
+   *  dropped for good, with an `error` event as the only trace. */
   async #resubscribe() {
-    const old = [...this.#subs.values()];
+    const old = [...this.#subs.values()].filter((s) => s.stale);
     if (old.length === 0) return;
-    this.#subs.clear();
     let count = 0;
+    let failed = 0;
     for (const s of old) {
+      if (!s.stale || !this.#subs.has(s.id)) continue; // unsubscribed meanwhile, or done by a parallel pass
       try {
-        const id = String(await this.call('janzeer_subscribe', { kind: s.kind, params: s.params }));
+        const id = String(await this.call('janzeer_subscribe', { kind: s.kind, params: this.#resumeParams(s) }));
+        if (!this.#subs.has(s.id)) {
+          void this.unsubscribeRaw(id).catch(() => false); // the caller unsubscribed while we were asking
+          continue;
+        }
+        this.#subs.delete(s.id);
         s.id = id;
+        s.stale = false;
         this.#subs.set(id, s);
+        this.#flushOrphans(s);
         count++;
       } catch (e) {
+        failed++;
         this.#opts.onEvent?.({ type: 'error', error: e });
       }
     }
     if (count) this.#opts.onEvent?.({ type: 'resubscribed', count });
+    if (failed && !this.#closedByUser && !this.#resubTimer) {
+      // still connected: try the rest again shortly (a new reconnect marks everything stale and runs this anyway)
+      this.#resubTimer = setTimeout(() => {
+        this.#resubTimer = null;
+        if (this.connected) void this.#resubscribe();
+      }, 2000);
+    }
+  }
+
+  /** A newBlocks stream resumes right after the last block it delivered: the original `fromHeight` would replay every
+   *  block again, and without one the blocks committed during the outage would be skipped. */
+  #resumeParams(s: LiveSub): unknown {
+    if (s.kind !== 'newBlocks' || s.lastHeight === undefined) return s.params;
+    return { ...((s.params as object | null | undefined) ?? {}), fromHeight: s.lastHeight + 1 };
+  }
+
+  #deliver(sub: LiveSub, result: JsonValue) {
+    if (sub.kind === 'newBlocks' && result && typeof result === 'object' && !Array.isArray(result)) {
+      const h = Number(String((result as { [k: string]: JsonValue }).height));
+      if (Number.isFinite(h)) {
+        if (sub.lastHeight !== undefined && h <= sub.lastHeight) return; // replay overlap: exactly once by height
+        sub.lastHeight = h;
+      }
+    }
+    try {
+      sub.handler(result);
+    } catch (e) {
+      this.#opts.onEvent?.({ type: 'error', error: e });
+    }
+  }
+
+  #flushOrphans(sub: LiveSub) {
+    const held = this.#orphans.get(sub.id);
+    if (!held) return;
+    this.#orphans.delete(sub.id);
+    for (const r of held) this.#deliver(sub, r);
   }
 
   #onMessage(text: string) {
@@ -259,12 +331,15 @@ export class JanzeerRpcWs extends RpcMethods {
       const o = m as { [k: string]: JsonValue };
       if (o.method === 'janzeer_subscription' && o.params && typeof o.params === 'object') {
         const p = o.params as { [k: string]: JsonValue };
-        const sub = this.#subs.get(String(p.subscription));
-        if (sub && p.result !== undefined) {
-          try {
-            sub.handler(p.result);
-          } catch (e) {
-            this.#opts.onEvent?.({ type: 'error', error: e });
+        const subId = String(p.subscription);
+        const sub = this.#subs.get(subId);
+        if (p.result !== undefined) {
+          if (sub) this.#deliver(sub, p.result);
+          else if (this.#orphans.size < 32 || this.#orphans.has(subId)) {
+            // not registered yet: the subscribe answer is still on its way through the promise queue
+            const held = this.#orphans.get(subId) ?? [];
+            if (held.length < 256) held.push(p.result);
+            this.#orphans.set(subId, held);
           }
         }
         continue;

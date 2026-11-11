@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { WebSocketServer, WebSocket as NodeWebSocket } from 'ws';
-import { JanzeerRpc, JanzeerRpcWs, NonceMismatchError, RpcInvalidParamsError, RpcNotFoundError } from '../src/index.js';
+import { JanzeerRpc, JanzeerRpcWs, NetworkError, NonceMismatchError, RpcInvalidParamsError, RpcNotFoundError } from '../src/index.js';
 
 const reply = (id: unknown, result?: unknown, error?: unknown) => JSON.stringify({ jsonrpc: '2.0', id, ...(error ? { error } : { result }) });
 
@@ -46,6 +46,7 @@ describe('JanzeerRpcWs', () => {
   let server: WebSocketServer;
   let port: number;
   let subs = 0;
+  const fromHeights: unknown[] = [];
   const clients = new Set<NodeWebSocket>();
   beforeAll(async () => {
     server = new WebSocketServer({ port: 0 });
@@ -59,8 +60,9 @@ describe('JanzeerRpcWs', () => {
           case 'janzeer_getTip': ws.send(reply(m.id, { type: 'main', height: 10, hash: 'h', previousHash: 'p', timestamp: 1, producer: 'k', signature: 's', epochIndex: 1, transactionsCount: 0 })); break;
           case 'janzeer_subscribe': {
             const id = 'sub' + ++subs;
+            if (m.params.kind === 'newBlocks') fromHeights.push(m.params.params?.fromHeight);
             ws.send(reply(m.id, id));
-            setTimeout(() => ws.send(JSON.stringify({ jsonrpc: '2.0', method: 'janzeer_subscription', params: { subscription: id, kind: m.params.kind, result: m.params.kind === 'newBlocks' ? { type: 'main', height: 11, hash: 'h2', previousHash: 'h', timestamp: 2, producer: 'k', signature: 's' } : { blockHeight: 11, blockHash: 'h2', transaction: { hash: 'tx1', type: 'transfer', status: 'FINAL', amount: 1.25 } } } })), 20);
+            setTimeout(() => ws.send(JSON.stringify({ jsonrpc: '2.0', method: 'janzeer_subscription', params: { subscription: id, kind: m.params.kind, result: m.params.kind === 'newBlocks' ? { type: 'main', height: Math.max(11, m.params.params?.fromHeight ?? 11), hash: 'h2', previousHash: 'h', timestamp: 2, producer: 'k', signature: 's' } : { blockHeight: 11, blockHash: 'h2', transaction: { hash: 'tx1', type: 'transfer', status: 'FINAL', amount: 1.25 } } } })), 20);
             break;
           }
           case 'janzeer_unsubscribe': ws.send(reply(m.id, true)); break;
@@ -90,9 +92,18 @@ describe('JanzeerRpcWs', () => {
     expect(ws.connected).toBe(true);
     expect(events).toContain('resubscribed');
     expect(sub.id).not.toBe(firstId);
-    expect(blocks.length).toBeGreaterThanOrEqual(2); // the replayed notification after resubscribe
+    // the stream resumes right after the last delivered block: no replay from the original fromHeight, no duplicate
+    expect(fromHeights).toEqual([1, 12]);
+    expect(blocks).toEqual([11, 12]);
     expect(await sub.unsubscribe()).toBe(true);
     ws.close();
     expect(ws.connected).toBe(false);
+  });
+  it('a failed connect leaves no background retry behind', async () => {
+    const events: string[] = [];
+    await expect(JanzeerRpcWs.connect('ws://127.0.0.1:1', { WebSocket: NodeWebSocket as any, reconnectDelayMs: 20, connectTimeoutMs: 500, onEvent: (e) => events.push(e.type) })).rejects.toBeInstanceOf(NetworkError);
+    const seen = events.length;
+    await new Promise((r) => setTimeout(r, 300));
+    expect(events.length).toBe(seen); // no further open/close/error from an orphan reconnect chain
   });
 });

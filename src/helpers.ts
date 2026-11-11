@@ -33,7 +33,16 @@ export async function waitForFinality(source: RpcMethods | JanzeerClient, hash: 
   while (Date.now() < deadline) {
     opts.signal?.throwIfAborted();
     if (source instanceof JanzeerClient) {
-      const v = await restView(source, hash);
+      // The transaction was already accepted: one dropped poll must not look like a failed send (a caller that resends
+      // on that error pays twice). A transport failure is retried until the deadline, exactly like the RPC branch.
+      let v: TxView | null;
+      try {
+        v = await restView(source, hash);
+      } catch (e) {
+        if (!(e instanceof NetworkError)) throw e;
+        await sleep(1000, opts.signal);
+        continue;
+      }
       last = v;
       if (v?.status === 'FINAL') return v;
       await sleep(opts.pollMs ?? 1500, opts.signal);
