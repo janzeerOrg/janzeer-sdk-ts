@@ -35,3 +35,7 @@ copies them here; `npm run check:vectors` (also part of CI) fails on drift.
 - Every new node method gets a typed wrapper in `src/rpc/methods.ts` or `src/rest/client.ts`, a model mapper,
   a unit test with a mocked transport, and a line in `CHANGELOG.md`.
 - Public API says *validator*; *promoter* only survives as deprecated aliases in `janzeer-sdk/crypto`.
+
+## Bounties
+
+Some issues carry a bounty paid in JNZ: see [BOUNTIES.md](BOUNTIES.md).
