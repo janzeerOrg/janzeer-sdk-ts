@@ -3,30 +3,30 @@ import { JanzeerRpcWs } from 'janzeer-sdk';
 
 const url = process.env.JANZEER_WS_URL ?? 'wss://explorer.janzeer.org/rpc/ws';
 const seconds = Number(process.env.EXAMPLE_SECONDS ?? 20);
+const maxBlocks = Number(process.env.EXAMPLE_BLOCKS ?? 0);
 
-console.log(`Connecting to ${url}...`);
 const ws = await JanzeerRpcWs.connect(url, {
   onEvent: (e) => e.type === 'error' && console.error('[ws] error', e),
 });
 
 const tip = await ws.getTip();
-console.log(`Current height: ${tip.height}. Subscribing to new blocks...`);
+let seen = 0;
 
-await ws.subscribeNewBlocks({ fromHeight: tip.height, includeTransactions: false }, (b) => {
-  console.log(
-    `Block #${b.height} | Hash: ${b.hash.slice(0, 12)}... | Producer: ${b.producer.slice(0, 12)}... | Txs: ${b.transactionsCount}`
-  );
-});
-
-console.log(`Listening... (exiting in ${seconds}s)`);
-
-const timer = setTimeout(() => {
-  ws.close();
-  process.exit(0);
-}, seconds * 1000);
-
-process.on('SIGINT', () => {
+const stop = () => {
   clearTimeout(timer);
   ws.close();
   process.exit(0);
+};
+
+const timer = setTimeout(stop, seconds * 1000);
+process.on('SIGINT', stop);
+
+await ws.subscribeNewBlocks({ fromHeight: tip.height, includeTransactions: false }, (b) => {
+  console.log(\lock #\ | hash \ | producer \ | txs \);
+  seen += 1;
+  if (maxBlocks > 0 && seen >= maxBlocks) {
+    stop();
+  }
 });
+
+console.log(\listening on \ from #\ (maxBlocks=\, timeout=\s)...\);
