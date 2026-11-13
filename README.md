@@ -29,66 +29,30 @@ console.log(me.checksumAddress, formatJnz(await client.balance(me.address)));
 
 const tx = me.signTx(TxBuilder.transfer({
   from: me.address, to: '0x598b1301acef3baba6ce25e38dd17b723f7b98b1',
-  amount: '1.25', data: 'hello', nonce: await client.nonce(me.address),
+  amount: '1.25', data: 'hello', nonce: await rpc.getNonce(me.address)
 }));
-await client.submit(tx);                                            // HTTP 201, or a typed error
-const final = await waitForFinality(rpc, tx.hash);                  // one or two 15-second slots
-console.log('final in block', final.blockHeight);
+const hash = await rpc.send(tx);
+await waitForFinality(client, hash);
 ```
-
-That is the whole integration: derive → nonce → build → sign → submit → wait. A committed block is final
-(2f+1 BFT commit), so there is no confirmation count.
-
-## What is in the box
-
-| Area | Entry points | Guide |
-|---|---|---|
-| Keys & addresses | `Mnemonic`, `Account`, `toChecksumAddress`, `isValidAddress` | [wallet-and-keys](docs/wallet-and-keys.md) |
-| Transactions | `TxBuilder.transfer / registerValidator / exitValidator / token.*` → `UnsignedTx` → `SignedTx` | [sending-transactions](docs/sending-transactions.md) |
-| Amounts | `toScaledLong`, `fromScaledLong`, `formatJnz`, `parseJnz`, `addAmounts`… | [sending-transactions](docs/sending-transactions.md#amounts) |
-| REST | `JanzeerClient`: balances, nonces, transactions, blocks, validators, tokens (typed, paged) | [reading-chain-data](docs/reading-chain-data.md) |
-| JSON-RPC | `JanzeerRpc` (HTTP, batches) and `JanzeerRpcWs` (WebSocket + `newBlocks` / `addressActivity` subscriptions) | [json-rpc-and-subscriptions](docs/json-rpc-and-subscriptions.md) |
-| Flows | `waitForFinality`, `sendAndWait`, `nextNonce` | [json-rpc-and-subscriptions](docs/json-rpc-and-subscriptions.md#finality) |
-| Errors | `TxRejectedError`, `NonceMismatchError`, `RateLimitedError`, `RpcError`… | [errors](docs/errors.md) |
-| Vault | `janzeer-sdk/vault`: `encryptVault` / `decryptVault` (PBKDF2 + AES-GCM) | [vault](docs/vault.md) |
-| Legacy API | `janzeer-sdk/crypto`: the old `janzeerCrypto.js` functions | [migration](docs/migration.md) |
-
-Subpath exports: `janzeer-sdk` (everything), `janzeer-sdk/rest`, `janzeer-sdk/rpc`, `janzeer-sdk/vault`,
-`janzeer-sdk/crypto`. ESM and CommonJS, TypeScript declarations included, `sideEffects: false`.
-
-## Platforms
-
-- **Node.js ≥ 20** (global `fetch` and WebCrypto). WebSocket: Node ≥ 22 has a global `WebSocket`; on 20–21 pass the
-  [`ws`](https://www.npmjs.com/package/ws) package: `JanzeerRpcWs.connect(url, { WebSocket })`.
-- **Browsers** (evergreen): works from plain-http pages too — the crypto is pure JS (`@noble/*`), nothing
-  depends on `crypto.subtle`. Nodes answer CORS `*`.
-- Deno / Bun: global `fetch` + `WebSocket`, no special setup.
-
-## Compatibility
-
-| SDK | Node | REST envelope `version` | Wire protocol | Vectors |
-|---|---|---|---|---|
-| 0.1.x | 0.1.14 | 1.1.0 | 3.4.0 | v2 |
-
-`SPEC_VERSION` exports these values; the e2e test checks them against the node on the first call.
 
 ## Examples
 
-Runnable scripts in `examples/` ([quickstart](examples/01-quickstart-transfer.ts)): quickstart transfer, address-activity subscription, token
-create + transfer, validator registration (dry run), vault round trip. `npm run examples` runs them against
-the network in `JANZEER_NODE_URL`.
+The `examples/` directory contains ready-to-run scripts:
 
-## Conformance
+* [Quickstart Transfer](./examples/01-quickstart-transfer.ts): The 60-second quickstart above.
+* [Address Activity](./examples/02-subscribe-address-activity.ts): Watch an address for incoming/outgoing transactions.
+* [Token Lifecycle](./examples/03-token-create-and-transfer.ts): Create a new token and transfer it.
+* [Validator Registration](./examples/04-register-validator.ts): Register a new validator on the network.
+* [Vault Roundtrip](./examples/05-vault-roundtrip.ts): Deposit and withdraw from a vault.
+* [Watch New Blocks](./examples/06-watch-new-blocks.ts): Subscribe to the blockchain feed and print finalized blocks.
 
-Every release reproduces the shared [conformance vectors](docs/conformance.md) byte-for-byte (seed, keys,
-address, every transaction preimage/hash/signature) and passes the 14-step end-to-end flow against a real
-network. `npm test` runs the vectors; `npm run e2e` runs the flow.
+Run them with:
+```bash
+JANZEER_NODE_URL=http://localhost:7019 npm run examples
+```
 
-## Documentation
+## JSON-RPC and subscriptions
 
-- Guides: `docs/` (start with [wallet-and-keys](docs/wallet-and-keys.md)) · API reference: `npm run docs` → `docs/api/` (TypeDoc)
-- Chain documentation: developer guide, API reference, yellow paper — https://janzeer.org
-
-## License
-
-Apache-2.0. See [SECURITY.md](SECURITY.md) for reporting vulnerabilities.
+The node serves JSON-RPC 2.0 at `POST /rpc` and over WebSocket at `/rpc/ws` (same methods, plus
+subscriptions). `JanzeerRpc` and `JanzeerRpcWs` expose **one typed method per `janzeer_*` method**; `call()`
+sends anything else.
