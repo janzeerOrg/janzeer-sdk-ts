@@ -22,11 +22,11 @@ const timer = setTimeout(stop, seconds * 1000);
 process.on('SIGINT', stop);
 
 await ws.subscribeNewBlocks({ fromHeight: tip.height, includeTransactions: false }, (b) => {
-  console.log(\lock #\ | hash \ | producer \ | txs \);
+  console.log(`block #${b.height} | hash ${b.hash.slice(0, 12)} | producer ${b.producer.slice(0, 12)} | txs ${b.transactionsCount}`);
   seen += 1;
   if (maxBlocks > 0 && seen >= maxBlocks) {
     stop();
   }
 });
 
-console.log(\listening on \ from #\ (maxBlocks=\, timeout=\s)...\);
+console.log(`listening on ${url} from #${tip.height} (maxBlocks=${maxBlocks || 'unlimited'}, timeout=${seconds}s)...`);
