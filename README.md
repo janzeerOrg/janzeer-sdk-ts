@@ -75,7 +75,7 @@ Subpath exports: `janzeer-sdk` (everything), `janzeer-sdk/rest`, `janzeer-sdk/rp
 ## Examples
 
 Runnable scripts in `examples/` ([quickstart](examples/01-quickstart-transfer.ts)): quickstart transfer, address-activity subscription, token
-create + transfer, validator registration (dry run), vault round trip. `npm run examples` runs them against
+create + transfer, validator registration (dry run), vault round trip, and [watch new blocks](examples/06-watch-new-blocks.ts). `npm run examples` runs them against
 the network in `JANZEER_NODE_URL`.
 
 ## Conformance
