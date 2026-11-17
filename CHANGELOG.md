@@ -3,6 +3,11 @@
 All notable changes to `janzeer-sdk` are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [SemVer](https://semver.org/).
 
+## [0.1.11] — 2026-11-17
+
+### Added
+- **Arabic translation of the "Sending transactions" guide**: [`docs/ar/sending-transactions.md`](docs/ar/sending-transactions.md) with right-to-left layout and localized technical terminology. Contributed by @genda-benjamin (#7, #10). No code change.
+
 ## [0.1.10] — 2026-11-17
 
 Verified against node **0.1.14** (REST envelope 1.1.0 / protocol 3.4.0).

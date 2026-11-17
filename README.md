@@ -44,7 +44,7 @@ That is the whole integration: derive → nonce → build → sign → submit �
 | Area | Entry points | Guide |
 |---|---|---|
 | Keys & addresses | `Mnemonic`, `Account`, `toChecksumAddress`, `isValidAddress` | [wallet-and-keys](docs/wallet-and-keys.md) |
-| Transactions | `TxBuilder.transfer / registerValidator / exitValidator / token.*` → `UnsignedTx` → `SignedTx` | [sending-transactions](docs/sending-transactions.md) |
+| Transactions | `TxBuilder.transfer / registerValidator / exitValidator / token.*` → `UnsignedTx` → `SignedTx` | [sending-transactions](docs/sending-transactions.md)<br>العربية: [docs/ar/sending-transactions.md](docs/ar/sending-transactions.md) |
 | Amounts | `toScaledLong`, `fromScaledLong`, `formatJnz`, `parseJnz`, `addAmounts`… | [sending-transactions](docs/sending-transactions.md#amounts) |
 | REST | `JanzeerClient`: balances, nonces, transactions, blocks, validators, tokens (typed, paged) | [reading-chain-data](docs/reading-chain-data.md) |
 | JSON-RPC | `JanzeerRpc` (HTTP, batches) and `JanzeerRpcWs` (WebSocket + `newBlocks` / `addressActivity` subscriptions) | [json-rpc-and-subscriptions](docs/json-rpc-and-subscriptions.md) |
