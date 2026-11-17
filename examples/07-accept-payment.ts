@@ -39,13 +39,27 @@ const sub = await ws.subscribeAddressActivity([recipient], async (ev) => {
     compareAmounts(tx.amount, invoiceAmount) >= 0
   ) {
     handled = true;
-    clearTimeout(timeout);
-    const final = await waitForFinality(ws, tx.hash);
-    if (final.status === 'FINAL') {
-      console.log(`paid: ${reference} 0.5 JNZ in block ${final.blockHeight}`);
+    try {
+      const final = await waitForFinality(ws, tx.hash);
+      if (final.status === 'FINAL') {
+        clearTimeout(timeout);
+        console.log(`paid: ${reference} ${invoiceAmount} JNZ in block ${final.blockHeight}`);
+        await sub.unsubscribe();
+        ws.close();
+        process.exit(0);
+      } else {
+        clearTimeout(timeout);
+        console.error(`payment transaction ${tx.hash} ended with non-final status: ${final.status}`);
+        await sub.unsubscribe();
+        ws.close();
+        process.exit(1);
+      }
+    } catch (err) {
+      clearTimeout(timeout);
+      console.error(`waitForFinality failed: ${err}`);
       await sub.unsubscribe();
       ws.close();
-      process.exit(0);
+      process.exit(1);
     }
   }
 });
@@ -67,4 +81,5 @@ const tx = payer.signTx(
   }),
 );
 await client.submit(tx);
+client.close();
 console.log(`invoice payment submitted: tx ${tx.hash}`);
