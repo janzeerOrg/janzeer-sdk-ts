@@ -13,6 +13,7 @@ All notable changes to `janzeer-sdk` are documented here. The format follows
   (epoch genesis blocks) are unchanged.
 
 ### Added
+- Example `examples/07-accept-payment.ts`: watch an address, match invoice memo, and confirm finality (#6).
 - Example `examples/06-watch-new-blocks.ts`: follow new blocks over the WebSocket (`EXAMPLE_BLOCKS` stops after N).
   Contributed by @RaoroniRonaldo (#5).
 

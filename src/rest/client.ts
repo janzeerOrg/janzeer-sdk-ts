@@ -52,6 +52,9 @@ export class JanzeerClient {
     this.#retry429 = opts.retryOnRateLimit ?? true;
   }
 
+  /** Close any resources held by this client instance (no-op for fetch-based REST client). */
+  close(): void {}
+
   // ---- low level -------------------------------------------------------------------------------------------
 
   /** `GET path?query` → the envelope `payload` (lossless JSON tree). `notFound` short-circuits a 404. */
