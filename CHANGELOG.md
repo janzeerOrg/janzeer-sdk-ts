@@ -3,6 +3,12 @@
 All notable changes to `janzeer-sdk` are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [SemVer](https://semver.org/).
 
+## [0.1.12] — 2026-11-25
+
+Verified against node **0.1.15** (REST envelope 1.1.0 / protocol 3.4.0). No API change.
+
+- `SPEC_VERSION.node` is **0.1.15** (node 0.1.15: consensus safety release, vote lock active from block #357,023; API 1.1.0 unchanged, wire protocol 3.4.0 until that block and 3.5.0 from it. The SDK speaks HTTP only, so nothing changes for applications).
+
 ## [0.1.11] — 2026-11-17
 
 ### Added
